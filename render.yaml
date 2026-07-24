@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: lms-platform
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npx prisma db push && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lms-database
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: "https://lms-platform.onrender.com"
+
+databases:
+  - name: lms-database
+    plan: free
+    databaseName: lms
+    user: lms_user

@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("STUDENT") // ADMIN | TEACHER | STUDENT
+  avatarUrl     String?
+  phone         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  teacherGroups Group[]        @relation("TeacherGroups")
+  studentGroups GroupStudent[]
+  attendances   Attendance[]
+  submissions   Submission[]
+
+  @@index([role])
+  @@index([email])
+}
+
+model Group {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  teacherId   String
+  teacher     User            @relation("TeacherGroups", fields: [teacherId], references: [id], onDelete: Cascade)
+  students    GroupStudent[]
+  assignments Assignment[]
+  attendances Attendance[]
+
+  @@index([teacherId])
+}
+
+model GroupStudent {
+  id        String @id @default(cuid())
+  groupId   String
+  studentId String
+
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  enrolledAt DateTime @default(now())
+
+  @@unique([groupId, studentId])
+  @@index([groupId])
+  @@index([studentId])
+}
+
+model Attendance {
+  id        String @id @default(cuid())
+  date      DateTime
+  status    String // PRESENT | ABSENT | LATE
+
+  groupId   String
+  studentId String
+
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([groupId, studentId, date])
+  @@index([groupId, date])
+  @@index([studentId])
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  maxScore    Float    @default(100)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  groupId     String
+  group       Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@index([groupId])
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  content      String?
+  fileUrl      String?
+  fileName     String?
+  status       String   @default("PENDING") // PENDING | GRADED | RETURNED
+  grade        Float?
+  feedback     String?
+  submittedAt  DateTime @default(now())
+  gradedAt     DateTime?
+
+  assignmentId String
+  studentId    String
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@index([assignmentId])
+  @@index([studentId])
+  @@index([status])
+}
