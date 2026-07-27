@@ -23,7 +23,14 @@ export async function GET(request: NextRequest) {
         where: { teacherId: userId },
         select: { id: true },
       });
-      where.groupId = { in: teacherGroups.map((g) => g.id) };
+      const teacherGroupIds = teacherGroups.map((g) => g.id);
+      if (groupId && teacherGroupIds.includes(groupId)) {
+        where.groupId = groupId;
+      } else if (groupId) {
+        where.groupId = "__NONE__";
+      } else {
+        where.groupId = { in: teacherGroupIds };
+      }
     } else if (role === "STUDENT") {
       const studentGroupIds = await prisma.groupStudent.findMany({
         where: { studentId: userId },

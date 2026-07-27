@@ -3,7 +3,7 @@ services:
     name: lms-platform
     runtime: node
     plan: free
-    buildCommand: npm install --include=dev && npx prisma db push && npm run build
+    buildCommand: node scripts/switch-to-pg.js && npm install --include=dev && npx prisma generate && npx prisma db push --skip-generate && npm run build
     startCommand: npm run start
     envVars:
       - key: DATABASE_URL
@@ -16,6 +16,8 @@ services:
         generateValue: true
       - key: NEXTAUTH_URL
         value: "https://lms-platform.onrender.com"
+      - key: AUTH_TRUSTED_HOST
+        value: "lms-platform.onrender.com"
 
 databases:
   - name: lms-database

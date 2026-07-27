@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import StatCard from "@/components/dashboard/stat-card";
 
 export default function AdminDashboard() {
@@ -48,9 +49,9 @@ export default function AdminDashboard() {
               { href: "/admin/groups", icon: "📋", label: "Guruhlarni boshqarish" },
               { href: "/admin/settings", icon: "⚙️", label: "Tizim sozlamalari" },
             ].map((item) => (
-              <a key={item.href} href={item.href} className="block p-3 rounded-lg text-sm transition-all duration-200 hover:translate-x-1" style={{ background: "rgba(99, 102, 241, 0.06)", border: "1px solid rgba(99, 102, 241, 0.1)", color: "var(--text-secondary)" }}>
+              <Link key={item.href} href={item.href} className="block p-3 rounded-lg text-sm transition-all duration-200 hover:translate-x-1" style={{ background: "rgba(99, 102, 241, 0.06)", border: "1px solid rgba(99, 102, 241, 0.1)", color: "var(--text-secondary)" }}>
                 {item.icon} {item.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

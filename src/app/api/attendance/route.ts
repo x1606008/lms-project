@@ -13,23 +13,32 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get("groupId");
     const date = searchParams.get("date");
+    const role = (session.user as { role: string }).role;
+    const userId = (session.user as { id: string }).id;
 
-    if (!groupId || !date) {
-      return NextResponse.json(
-        { error: "groupId va date kerak" },
-        { status: 400 }
-      );
+    const where: Record<string, unknown> = {};
+
+    if (role === "STUDENT") {
+      where.studentId = userId;
+      if (groupId && groupId !== "all") where.groupId = groupId;
+      if (date && date !== "all") where.date = new Date(date);
+    } else {
+      if (!groupId || !date) {
+        return NextResponse.json(
+          { error: "groupId va date kerak" },
+          { status: 400 }
+        );
+      }
+      where.groupId = groupId;
+      where.date = new Date(date);
     }
-
     const attendance = await prisma.attendance.findMany({
-      where: {
-        groupId,
-        date: new Date(date),
-      },
+      where,
       include: {
         student: { select: { id: true, name: true, email: true } },
+        group: { select: { id: true, name: true } },
       },
-      orderBy: { student: { name: "asc" } },
+      orderBy: { date: "desc" },
     });
 
     return NextResponse.json({ attendance });

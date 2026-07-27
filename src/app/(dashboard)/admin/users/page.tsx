@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-interface User { id: string; name: string; email: string; role: string; phone: string | null; isActive: boolean; createdAt: string; _count: { teacherGroups: number; studentGroups: number } }
+interface User { id: string; name: string; email: string; role: string; phone: string | null; avatarUrl: string | null; isActive: boolean; createdAt: string; _count: { teacherGroups: number; studentGroups: number } }
 
 const ROLE_LABELS: Record<string, string> = { ADMIN: "Administrator", TEACHER: "O'qituvchi", STUDENT: "O'quvchi" };
 const ROLE_COLORS: Record<string, string> = { ADMIN: "badge-info", TEACHER: "badge-success", STUDENT: "badge-warning" };
@@ -14,6 +14,7 @@ export default function UsersPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "STUDENT" });
   const [error, setError] = useState("");
+  const fileInputs = useRef<Record<string, HTMLInputElement>>({});
 
   const loadUsers = async () => {
     setLoading(true);
@@ -37,6 +38,17 @@ export default function UsersPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Bu foydalanuvchini o'chirmoqchimisiz?")) return;
     await fetch(`/api/users/${id}`, { method: "DELETE" }); loadUsers();
+  };
+
+  const handleAvatarUpload = async (userId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", userId);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const data = await res.json();
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, avatarUrl: data.avatarUrl } : u));
+    }
   };
 
   return (
@@ -71,33 +83,48 @@ export default function UsersPage() {
         ))}
       </div>
 
-      <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-        <table className="w-full text-sm">
-          <thead>
-            <tr style={{ background: "rgba(99, 102, 241, 0.06)" }}>
-              <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-muted)" }}>Ism</th>
-              <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-muted)" }}>Email</th>
-              <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-muted)" }}>Rol</th>
-              <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-muted)" }}>Holat</th>
-              <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-muted)" }}>Amallar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Yuklanmoqda...</td></tr>
-            ) : users.length === 0 ? (
-              <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Foydalanuvchilar topilmadi</td></tr>
-            ) : users.map((u) => (
-              <tr key={u.id} className="table-row" style={{ borderTop: "1px solid var(--border)" }}>
-                <td className="px-4 py-3 font-medium">{u.name}</td>
-                <td className="px-4 py-3" style={{ color: "var(--text-muted)" }}>{u.email}</td>
-                <td className="px-4 py-3"><span className={`badge ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
-                <td className="px-4 py-3"><span className={`badge ${u.isActive ? "badge-success" : "badge-danger"}`}>{u.isActive ? "Faol" : "Nofaol"}</span></td>
-                <td className="px-4 py-3 text-right"><button onClick={() => handleDelete(u.id)} className="btn-danger px-3 py-1 rounded-lg text-xs">O'chirish</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {loading ? (
+          <p className="col-span-full text-center py-8" style={{ color: "var(--text-muted)" }}>Yuklanmoqda...</p>
+        ) : users.length === 0 ? (
+          <p className="col-span-full text-center py-8" style={{ color: "var(--text-muted)" }}>Foydalanuvchilar topilmadi</p>
+        ) : users.map((u, i) => (
+          <div key={u.id} className="glass-card rounded-xl p-5 animate-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="relative group cursor-pointer"
+                onClick={() => fileInputs.current[u.id]?.click()}
+              >
+                {u.avatarUrl ? (
+                  <img src={u.avatarUrl} alt={u.name} className="w-12 h-12 rounded-full object-cover" style={{ border: "2px solid var(--border)" }} />
+                ) : (
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "white" }}>
+                    {u.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: "rgba(0,0,0,0.5)" }}>
+                  <span className="text-white text-xs">+</span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={(el) => { if (el) fileInputs.current[u.id] = el; }}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAvatarUpload(u.id, f); }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate" style={{ color: "var(--text-primary)" }}>{u.name}</p>
+                <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{u.email}</p>
+              </div>
+              <span className={`badge ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
+              <span>{u.isActive ? "Faol" : "Nofaol"}</span>
+              <button onClick={() => handleDelete(u.id)} className="btn-danger px-3 py-1 rounded-lg text-xs">O'chirish</button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

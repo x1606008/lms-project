@@ -78,7 +78,7 @@ export default function RegisterPage() {
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary w-full py-3 rounded-xl text-sm animate-fade-in" style={{ animationDelay: "0.35s" }}>
-              <span>{loading ? "Yaratilmoqda..." : "Ro&apos;yxatdan o&apos;tish"}</span>
+              <span>{loading ? "Yaratilmoqda..." : "Ro'yxatdan o'tish"}</span>
             </button>
           </form>
 

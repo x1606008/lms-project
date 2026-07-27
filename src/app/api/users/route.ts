@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         email: true,
         role: true,
         phone: true,
+        avatarUrl: true,
         isActive: true,
         createdAt: true,
         _count: {

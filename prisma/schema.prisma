@@ -3,29 +3,34 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String
-  role          String    @default("STUDENT") // ADMIN | TEACHER | STUDENT
-  avatarUrl     String?
-  phone         String?
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  password        String
+  role            String    @default("STUDENT") // SUPER_ADMIN | ADMIN | TEACHER | STUDENT | PARENT
+  avatarUrl       String?
+  phone           String?
+  isActive        Boolean   @default(true)
+  telegramChatId  String?   @unique
+  telegramUsername String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  teacherGroups Group[]        @relation("TeacherGroups")
-  studentGroups GroupStudent[]
-  attendances   Attendance[]
-  submissions   Submission[]
+  teacherGroups    Group[]        @relation("TeacherGroups")
+  studentGroups    GroupStudent[]
+  attendances      Attendance[]
+  submissions      Submission[]
+  createdPayments  MonthlyPayment[] @relation("PaymentCreator")
+  bindingTokens    TelegramBindingToken[]
 
   @@index([role])
   @@index([email])
+  @@index([telegramChatId])
 }
 
 model Group {
@@ -40,6 +45,8 @@ model Group {
   students    GroupStudent[]
   assignments Assignment[]
   attendances Attendance[]
+  schedules   ClassSchedule[]
+  payments    MonthlyPayment[]
 
   @@index([teacherId])
 }
@@ -115,4 +122,46 @@ model Submission {
   @@index([assignmentId])
   @@index([studentId])
   @@index([status])
+}
+
+model ClassSchedule {
+  id          String   @id @default(cuid())
+  groupId     String
+  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int      // 0=Monday ... 6=Sunday
+  startTime   String   // "09:00"
+  endTime     String   // "10:30"
+  createdAt   DateTime @default(now())
+
+  @@unique([groupId, dayOfWeek])
+  @@index([groupId])
+}
+
+model MonthlyPayment {
+  id          String   @id @default(cuid())
+  groupId     String
+  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  amount      Float
+  month       Int
+  year        Int
+  perDay      Float
+  createdBy   String
+  creator     User     @relation("PaymentCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([groupId, month, year])
+  @@index([groupId])
+}
+
+model TelegramBindingToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }

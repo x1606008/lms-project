@@ -11,9 +11,22 @@ function randomStatus(): string {
 async function main() {
   console.log("🔄 Seed boshlanmoqda...");
 
+  const superAdminPassword = await bcrypt.hash("superadmin123", 10);
   const adminPassword = await bcrypt.hash("admin123", 10);
   const teacherPassword = await bcrypt.hash("teacher123", 10);
   const studentPassword = await bcrypt.hash("student123", 10);
+
+  const superAdmin = await prisma.user.upsert({
+    where: { email: "superadmin@lms.uz" },
+    update: {},
+    create: {
+      name: "Super Admin",
+      email: "superadmin@lms.uz",
+      password: superAdminPassword,
+      role: "SUPER_ADMIN",
+      phone: "+998900000000",
+    },
+  });
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@lms.uz" },
@@ -251,9 +264,10 @@ async function main() {
   console.log(`   Davomat yozuvlari:  ${totalAttendance}`);
 
   console.log("\n🔑 TEST LOGINLAR:");
-  console.log("   Admin:      admin@lms.uz     / admin123");
-  console.log("   O'qituvchi: karimov@lms.uz   / teacher123");
-  console.log("   O'quvchi:   jasur@lms.uz     / student123");
+  console.log("   Super Admin: superadmin@lms.uz / superadmin123");
+  console.log("   Admin:       admin@lms.uz      / admin123");
+  console.log("   O'qituvchi:  karimov@lms.uz    / teacher123");
+  console.log("   O'quvchi:    jasur@lms.uz      / student123");
 }
 
 main()

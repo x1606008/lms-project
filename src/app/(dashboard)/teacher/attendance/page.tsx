@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-interface Group { id: string; name: string; students: { student: { id: string; name: string } }[] }
+interface Group { id: string; name: string }
 
 export default function AttendancePage() {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -16,15 +16,16 @@ export default function AttendancePage() {
   useEffect(() => { fetch("/api/groups").then((r) => r.json()).then((d) => setGroups(d.groups || [])); }, []);
 
   useEffect(() => {
-    if (!selectedGroup) return;
-    const group = groups.find((g) => g.id === selectedGroup);
-    if (group) setStudents(group.students?.map((s) => s.student) || []);
+    if (!selectedGroup) { setStudents([]); setRecords({}); return; }
+    fetch(`/api/groups/${selectedGroup}/students`).then((r) => r.json()).then((d) => {
+      setStudents((d.students || []).map((gs: { student: { id: string; name: string } }) => gs.student));
+    });
     fetch(`/api/attendance?groupId=${selectedGroup}&date=${date}`).then((r) => r.json()).then((d) => {
       const existing: Record<string, string> = {};
       (d.attendance || []).forEach((a: { studentId: string; status: string }) => { existing[a.studentId] = a.status; });
       setRecords(existing);
     });
-  }, [selectedGroup, date, groups]);
+  }, [selectedGroup, date]);
 
   const setStudentStatus = (studentId: string, status: string) => {
     setRecords((prev) => ({ ...prev, [studentId]: prev[studentId] === status ? "" : status }));
@@ -61,9 +62,9 @@ export default function AttendancePage() {
       {selectedGroup && students.length > 0 && (
         <>
           <div className="flex gap-4 mb-4 text-sm animate-fade-in" style={{ animationDelay: "0.15s" }}>
-            <span style={{ color: "var(--success)" }}>✅ Keldi: {stats.present}</span>
-            <span style={{ color: "var(--danger)" }}>❌ Kelmadi: {stats.absent}</span>
-            <span style={{ color: "var(--warning)" }}>⏰ Sababli: {stats.late}</span>
+            <span style={{ color: "var(--success)" }}>Keldi: {stats.present}</span>
+            <span style={{ color: "var(--danger)" }}>Kelmadi: {stats.absent}</span>
+            <span style={{ color: "var(--warning)" }}>Sababli: {stats.late}</span>
           </div>
 
           <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
@@ -76,7 +77,7 @@ export default function AttendancePage() {
               </thead>
               <tbody>
                 {students.map((s, i) => (
-                  <tr key={s.id} className="table-row" style={{ borderTop: "1px solid var(--border)", animationDelay: `${0.25 + i * 0.03}s` }}>
+                  <tr key={s.id} className="table-row" style={{ borderTop: "1px solid var(--border)" }}>
                     <td className="px-4 py-3 font-medium">{s.name}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center gap-2">
@@ -101,6 +102,10 @@ export default function AttendancePage() {
             </table>
           </div>
         </>
+      )}
+
+      {selectedGroup && !saving && students.length === 0 && (
+        <p className="text-center py-8" style={{ color: "var(--text-muted)" }}>Bu guruhda o'quvchilar yo'q</p>
       )}
     </div>
   );

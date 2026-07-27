@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
 
     const { name, email, password, role } = parsed.data;
 
+    if (["ADMIN", "SUPER_ADMIN"].includes(role)) {
+      return NextResponse.json({ error: "Admin sifatida ro'yxatdan o'tib bo'lmaydi" }, { status: 403 });
+    }
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json(

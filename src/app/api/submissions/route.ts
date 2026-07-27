@@ -27,10 +27,12 @@ export async function GET(request: NextRequest) {
         where: { groupId: { in: teacherGroups.map((g) => g.id) } },
         select: { id: true },
       });
-      where.assignmentId = {
-        in: teacherAssignments.map((a) => a.id),
-        ...(assignmentId ? { equals: assignmentId } : {}),
-      };
+      const teacherAssignmentIds = teacherAssignments.map((a) => a.id);
+      if (assignmentId) {
+        where.assignmentId = teacherAssignmentIds.includes(assignmentId) ? assignmentId : "__NONE__";
+      } else {
+        where.assignmentId = { in: teacherAssignmentIds };
+      }
     } else if (role === "STUDENT") {
       where.studentId = userId;
     }
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         assignment: {
-          select: { id: true, title: true, maxScore: true, groupId: true },
+          select: { id: true, title: true, maxScore: true, groupId: true, group: { select: { name: true } } },
         },
         student: { select: { id: true, name: true, email: true } },
       },
@@ -86,6 +88,13 @@ export async function POST(request: NextRequest) {
         { error: "Vazifa muddati o'tgan" },
         { status: 400 }
       );
+    }
+
+    const absent = await prisma.attendance.findFirst({
+      where: { studentId: userId, groupId: assignment.groupId, status: "ABSENT" },
+    });
+    if (absent) {
+      return NextResponse.json({ error: "Siz davomatda qatnashmaganligingiz sababli vazifani topshira olmaysiz" }, { status: 403 });
     }
 
     const existing = await prisma.submission.findUnique({

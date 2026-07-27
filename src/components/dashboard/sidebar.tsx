@@ -9,6 +9,7 @@ const navItems: Record<string, { label: string; href: string; icon: string }[]> 
     { label: "Dashboard", href: "/admin", icon: "📊" },
     { label: "Foydalanuvchilar", href: "/admin/users", icon: "👥" },
     { label: "Guruhlar", href: "/admin/groups", icon: "📋" },
+    { label: "To'lovlar", href: "/admin/payments", icon: "💰" },
     { label: "Sozlamalar", href: "/admin/settings", icon: "⚙️" },
   ],
   TEACHER: [
@@ -17,12 +18,14 @@ const navItems: Record<string, { label: string; href: string; icon: string }[]> 
     { label: "Davomat", href: "/teacher/attendance", icon: "✅" },
     { label: "Vazifalar", href: "/teacher/assignments", icon: "📝" },
     { label: "Baholash", href: "/teacher/grades", icon: "🎓" },
+    { label: "To'lovlar", href: "/teacher/payments", icon: "💰" },
   ],
   STUDENT: [
     { label: "Dashboard", href: "/student", icon: "📊" },
     { label: "Vazifalarim", href: "/student/assignments", icon: "📝" },
     { label: "Baholarim", href: "/student/grades", icon: "🎓" },
     { label: "Davomat", href: "/student/attendance", icon: "✅" },
+    { label: "To'lovlar", href: "/student/payments", icon: "💰" },
   ],
 };
 

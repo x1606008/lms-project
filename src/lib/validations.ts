@@ -62,3 +62,20 @@ export type AttendanceInput = z.infer<typeof attendanceSchema>;
 export type AssignmentInput = z.infer<typeof assignmentSchema>;
 export type SubmissionInput = z.infer<typeof submissionSchema>;
 export type GradeInput = z.infer<typeof gradeSchema>;
+
+export const classScheduleSchema = z.object({
+  groupId: z.string().min(1),
+  dayOfWeek: z.number().min(0).max(6),
+  startTime: z.string().min(1),
+  endTime: z.string().min(1),
+});
+
+export const monthlyPaymentSchema = z.object({
+  groupId: z.string().min(1),
+  amount: z.number().min(0, "Summa 0 dan katta bo'lishi kerak"),
+  month: z.number().min(1).max(12),
+  year: z.number().min(2024),
+});
+
+export type ClassScheduleInput = z.infer<typeof classScheduleSchema>;
+export type MonthlyPaymentInput = z.infer<typeof monthlyPaymentSchema>;

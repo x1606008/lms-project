@@ -1,0 +1,9 @@
+▲ Next.js 16.2.11
+- Local:         http://localhost:3000
+- Network:       http://192.168.100.25:3000
+✓ Ready in 1045ms
+[31m[auth][error][0m UntrustedHost: Host must be trusted. URL was: http://localhost:3000/api/auth/csrf. Read more at https://errors.authjs.dev#untrustedhost
+    at C:\Users\xussn\Desktop\kurs\lms-project\.next\server\chunks\_1w83njy._.js:404:51617
+    at iU (C:\Users\xussn\Desktop\kurs\lms-project\.next\server\chunks\_1w83njy._.js:404:54282)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async rQ.do (C:\Users\xussn\Desktop\kurs\lms-project\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.prod.js:5:21003)
