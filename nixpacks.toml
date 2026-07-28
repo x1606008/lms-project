@@ -1,0 +1,11 @@
+# phases
+phases:
+  setup:
+    nixPkgs: [nodejs_20]
+  build:
+    cmds:
+      - node scripts/switch-to-pg.js
+      - npm install --include=dev
+      - npx prisma generate
+      - npx prisma db push --skip-generate
+      - npm run build
