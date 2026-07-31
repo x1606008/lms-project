@@ -15,7 +15,7 @@ export async function GET() {
 
     let groups;
 
-    if (role === "ADMIN") {
+    if (role === "ADMIN" || role === "SUPER_ADMIN") {
       groups = await prisma.group.findMany({
         include: {
           teacher: { select: { id: true, name: true, email: true } },
@@ -56,7 +56,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    if (!session || (session.user as { role: string }).role !== "ADMIN") {
+    if (!session || (session.user as { role: string }).role !== "ADMIN" && (session.user as { role: string }).role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Ruxsat yo'q" }, { status: 401 });
     }
 

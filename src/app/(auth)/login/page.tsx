@@ -34,7 +34,7 @@ function LoginContent() {
       const sessionRes = await fetch("/api/auth/session");
       const sessionData = await sessionRes.json();
       const role = sessionData?.user?.role;
-      const dashboards: Record<string, string> = { ADMIN: "/admin", TEACHER: "/teacher", STUDENT: "/student" };
+      const dashboards: Record<string, string> = { SUPER_ADMIN: "/admin", ADMIN: "/admin", TEACHER: "/teacher", STUDENT: "/student" };
       router.push(dashboards[role] || "/");
     } catch { setError("Xatolik yuz berdi"); setLoading(false); }
   };

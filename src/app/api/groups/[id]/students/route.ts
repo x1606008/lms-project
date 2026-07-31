@@ -35,7 +35,7 @@ export async function POST(
 ) {
   try {
     const session = await auth();
-    if (!session || (session.user as { role: string }).role !== "ADMIN") {
+    if (!session || (session.user as { role: string }).role !== "ADMIN" && (session.user as { role: string }).role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Ruxsat yo'q" }, { status: 401 });
     }
 
@@ -72,7 +72,7 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-    if (!session || (session.user as { role: string }).role !== "ADMIN") {
+    if (!session || (session.user as { role: string }).role !== "ADMIN" && (session.user as { role: string }).role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Ruxsat yo'q" }, { status: 401 });
     }
 

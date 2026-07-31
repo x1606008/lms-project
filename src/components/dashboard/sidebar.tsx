@@ -6,6 +6,13 @@ import { useSession } from "next-auth/react";
 import { logout } from "@/lib/auth-actions";
 
 const navItems: Record<string, { label: string; href: string; icon: string }[]> = {
+  SUPER_ADMIN: [
+    { label: "Dashboard", href: "/admin", icon: "📊" },
+    { label: "Foydalanuvchilar", href: "/admin/users", icon: "👥" },
+    { label: "Guruhlar", href: "/admin/groups", icon: "📋" },
+    { label: "To'lovlar", href: "/admin/payments", icon: "💰" },
+    { label: "Sozlamalar", href: "/admin/settings", icon: "⚙️" },
+  ],
   ADMIN: [
     { label: "Dashboard", href: "/admin", icon: "📊" },
     { label: "Foydalanuvchilar", href: "/admin/users", icon: "👥" },
@@ -46,7 +53,7 @@ export default function Sidebar() {
           <div>
             <h1 className="text-lg font-bold gradient-text">LMS Platform</h1>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              {role === "ADMIN" && "Administrator"}
+              {(role === "ADMIN" || role === "SUPER_ADMIN") && "Administrator"}
               {role === "TEACHER" && "O'qituvchi paneli"}
               {role === "STUDENT" && "O'quvchi paneli"}
             </p>
