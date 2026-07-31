@@ -15,9 +15,9 @@ services:
       - key: AUTH_SECRET
         generateValue: true
       - key: NEXTAUTH_URL
-        value: "https://lms-platform.onrender.com"
+        value: "https://lms-platform-9knd.onrender.com"
       - key: AUTH_TRUSTED_HOST
-        value: "lms-platform.onrender.com"
+        value: "lms-platform-9knd.onrender.com"
 
 databases:
   - name: lms-database

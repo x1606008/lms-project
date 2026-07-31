@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { logout } from "@/lib/auth-actions";
 
 const navItems: Record<string, { label: string; href: string; icon: string }[]> = {
   SUPER_ADMIN: [
@@ -95,17 +94,16 @@ export default function Sidebar() {
             <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{session?.user?.email}</p>
           </div>
         </div>
-        <form action={logout}>
-          <button
-            type="submit"
-            className="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:translate-x-1"
-            style={{ color: "var(--text-muted)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--danger-bg)"; e.currentTarget.style.color = "var(--danger)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
-          >
-            🚪 Chiqish
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => { window.location.href = "/api/logout"; }}
+          className="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-200 hover:translate-x-1"
+          style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--danger-bg)"; e.currentTarget.style.color = "var(--danger)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
+        >
+          🚪 Chiqish
+        </button>
       </div>
     </aside>
   );
