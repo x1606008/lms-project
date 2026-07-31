@@ -44,6 +44,10 @@ yarn-error.log*
 # uploads
 /public/avatars/*
 
+# logs & temp
+*.log
+test-auth.js
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

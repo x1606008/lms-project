@@ -8,4 +8,5 @@ phases:
       - npm install --include=dev
       - npx prisma generate
       - npx prisma db push --skip-generate
+      - npx prisma db seed
       - npm run build

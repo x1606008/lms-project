@@ -3,7 +3,7 @@ services:
     name: lms-platform
     runtime: node
     plan: free
-    buildCommand: node scripts/switch-to-pg.js && npm install --include=dev && npx prisma generate && npx prisma db push --skip-generate && npm run build
+    buildCommand: node scripts/switch-to-pg.js && npm install --include=dev && npx prisma generate && npx prisma db push --skip-generate && npx prisma db seed && npm run build
     startCommand: npm run start
     envVars:
       - key: DATABASE_URL
