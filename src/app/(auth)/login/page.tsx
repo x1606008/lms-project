@@ -267,7 +267,7 @@ function LoginContent() {
           <div className="test-creds">
             <p>Test loginlar:</p>
             {[
-              { role: "Admin", email: "admin@lms.uz", pass: "admin123" },
+              { role: "Admin", email: "xato-admin@test.uz", pass: "xato-parol" },
               { role: "O'qituvchi", email: "karimov@lms.uz", pass: "teacher123" },
               { role: "O'quvchi", email: "jasur@lms.uz", pass: "student123" },
             ].map((t) => (
