@@ -7,7 +7,7 @@ const isPostgres = dbUrl.startsWith('postgresql://') || dbUrl.startsWith('postgr
 if (isPostgres) {
   const schemaPath = path.join(__dirname, '..', 'prisma', 'schema.prisma');
   let schema = fs.readFileSync(schemaPath, 'utf-8');
-  schema = schema.replace(/provider\s*=\s*"[^"]+"/, 'provider = "postgresql"');
+  schema = schema.replace(/provider\s*=\s*"sqlite"/, 'provider = "postgresql"');
   fs.writeFileSync(schemaPath, schema, 'utf-8');
   console.log('Schema switched to PostgreSQL');
 } else {
